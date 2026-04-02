@@ -1,0 +1,82 @@
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.container {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+    text-align: center;
+    width: 380px;
+}
+
+h1 {
+    color: #2e7d32;
+    margin-bottom: 5px;
+}
+
+.subtitle {
+    color: #66bb6a;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+input[type="file"] {
+    margin: 10px 0;
+}
+
+button {
+    background: linear-gradient(135deg, #43a047, #2e7d32);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    margin-top: 10px;
+    width: 100%;
+    font-weight: bold;
+}
+
+button:hover {
+    transform: translateY(-2px);
+}
+
+.preview img {
+    width: 100%;
+    margin-top: 15px;
+    border-radius: 15px;
+}
+
+.result {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f1f8e9;
+    border-radius: 12px;
+}
+
+.card {
+    background: #f9fff9;
+    padding: 15px;
+    border-radius: 15px;
+    margin-top: 20px;
+    text-align: left;
+}
+
+.card input,
+.card textarea {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border-radius: 8px;
+    border: 1px solid #c8e6c9;
+}
+
+.card h3 {
+    color: #2e7d32;
+}
