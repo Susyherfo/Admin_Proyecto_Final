@@ -24,8 +24,27 @@ async function identifyPlant() {
 
     const data = await response.json();
 
-    document.getElementById("result").innerHTML =
-        `🌿 ${data.name} <br> Confianza: ${(data.score * 100).toFixed(2)}%`;
+    const best = data.best;
+
+    let html = `
+        <h2>🌿 ${best.name}</h2>
+        <p>Confianza: ${(best.score * 100).toFixed(2)}%</p>
+        <p>Familia: ${best.family}</p>
+        <hr>
+        <h3>Otras coincidencias:</h3>
+    `;
+
+    data.results.slice(0, 3).forEach(r => {
+        html += `
+            <div style="margin-bottom:10px">
+                <strong>${r.name}</strong><br>
+                Confianza: ${(r.score * 100).toFixed(2)}%<br>
+                Familia: ${r.family}
+            </div>
+        `;
+    });
+
+    document.getElementById("result").innerHTML = html;
 }
 
 function savePlant() {
@@ -44,7 +63,7 @@ function savePlant() {
 
     localStorage.setItem("plants", JSON.stringify(plants));
 
-    alert("Información guardada 🌿");
+    alert("Información guardada");
 }
 
 async function loadStats() {
