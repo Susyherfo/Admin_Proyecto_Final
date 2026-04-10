@@ -1,128 +1,125 @@
-# Plant Lens - Identificador de Plantas con IA
+# Plant Lens — Pipeline Completo de Datos con IA
 
-Aplicación web que permite identificar plantas a partir de una imagen utilizando la API de Pl@ntNet.
-Además, los usuarios pueden agregar información adicional sobre las plantas detectadas.
-
----
-
-## Características
-
-* Subir imagen de una planta
-* Identificación automática usando IA (Pl@ntNet API)
-* Visualización del nombre científico
-* Porcentaje de confianza del modelo
-* Formulario para agregar información de la planta
-* Almacenamiento local de datos
-* Interfaz con estilo botánico
+**Curso:** Administración de Datos — LEAD University  
+**Modelo:** Pl@ntNet API (identificación de plantas por imagen)  
+**Base de datos:** MongoDB Atlas
 
 ---
 
-## Estructura del Proyecto
+## Arquitectura del pipeline
 
 ```
-plant-lens-app/
-│
-├── index.html
-├── style.css
-├── script.js
-├── app.py
+MongoDB Atlas
+  └── identifications (raw)
+         │
+         ▼
+      etl.py
+   (Extract → Transform → Load)
+         │
+         ▼
+  identifications_clean (curada)
+         │
+         ▼
+      app.py (Flask API)
+         │
+         ▼
+  index.html (Frontend)
+         │
+         ▼
+  Pl@ntNet API (Modelo IA)
+```
+
+---
+
+## Estructura de archivos
+
+```
+├── pipeline.py        ← Orquestador principal (corre todo en orden)
+├── etl.py             ← ETL: extrae, transforma y carga datos
+├── app.py             ← API Flask con todos los endpoints
+├── index.html         ← Interfaz web (tabs: Identify / Stats / History)
+├── style.css          ← Estilos botánicos
+├── script.js          ← Lógica del frontend
 └── README.md
 ```
 
 ---
 
-## Tecnologías utilizadas
-
-* HTML5
-* CSS3
-* JavaScript
-* Python
-* Flask
-* API Pl@ntNet
-
----
-
 ## Instalación
 
-### 1. Clonar o descargar el proyecto
-
+```bash
+pip install flask flask-cors pymongo requests
 ```
-git clone <tu-repositorio>
-cd plant-lens-app
-```
-
-### 2. Instalar dependencias
-
-```
-pip install flask requests flask-cors
-```
-
-### 3. Configurar API Key
-
-En `app.py` reemplazar:
-
-```
-API_KEY = "TU_API_KEY_AQUI"
-```
-
-con tu API key de Pl@ntNet.
 
 ---
 
 ## Ejecución
 
-### 1. Ejecutar backend
+### 1. Correr el pipeline completo (ETL + métricas + verificación)
 
+```bash
+python pipeline.py
 ```
+
+Esto ejecuta 4 etapas en orden y genera logs con evidencia de cada paso.
+
+### 2. Levantar la app Flask
+
+```bash
 python app.py
 ```
 
-Esto iniciará el servidor en:
+### 3. Abrir la interfaz
 
-```
-http://127.0.0.1:5000
-```
-
-### 2. Abrir frontend
-
-Abrir el archivo `index.html` en el navegador
-o usar un servidor local:
-
-```
-python -m http.server 5500
-```
+Abre `index.html` en tu navegador (o usa Live Server en VS Code).
 
 ---
 
-## Flujo de la Aplicación
+## Endpoints de la API
 
-1. Usuario sube imagen
-2. Frontend envía imagen al backend
-3. Backend llama API Pl@ntNet
-4. Se obtiene la especie
-5. Se muestra resultado en pantalla
-6. Usuario puede agregar información adicional
-
----
-
-## Funcionalidades futuras
-
-* Guardar plantas en base de datos
-* Historial de identificaciones
-* Subida de imágenes adicionales
-* Sistema colaborativo
-* Geolocalización de plantas
-* Diseño tipo app móvil
+| Método | Endpoint      | Descripción                                      |
+|--------|---------------|--------------------------------------------------|
+| POST   | /identify     | Identifica una planta con Pl@ntNet               |
+| GET    | /stats        | Top 5 plantas desde colección curada (post-ETL)  |
+| GET    | /history      | Últimas 20 identificaciones curadas              |
+| POST   | /save-note    | Guarda nota del usuario en MongoDB               |
+| GET    | /notes        | Obtiene notas guardadas                          |
 
 ---
 
-## Autor
+## Colecciones en MongoDB
 
-Proyecto desarrollado por Susana Herrera Fonseca & Yulissa Navarro
-Bachillerato en Ingeniería en Ciencia de Datos
+| Colección               | Descripción                          |
+|-------------------------|--------------------------------------|
+| `identifications`       | Datos crudos de cada identificación  |
+| `identifications_clean` | Datos curados post-ETL               |
+| `plant_notes`           | Notas escritas por el usuario        |
 
 ---
 
-## Licencia
+## Proceso ETL
 
-Este proyecto es para fines educativos.
+El script `etl.py` realiza:
+
+**Extracción:** Lee todos los documentos de `identifications`.
+
+**Transformación:**
+- Elimina duplicados por `_id`
+- Limpia valores nulos y corrige tipos
+- Normaliza nombres científicos
+- Genera campos derivados:
+  - `confidence_pct` — confianza en porcentaje
+  - `confidence_tier` — clasificación: high / medium / low
+  - `primary_common` — primer nombre común
+  - `etl_processed_at` — timestamp del procesamiento
+
+**Carga:** Inserta o actualiza documentos en `identifications_clean` usando upsert (idempotente, no duplica).
+
+---
+
+## Modelo de IA
+
+- **Tipo:** API de clasificación visual (Pl@ntNet v2)
+- **Input:** Imagen de planta (JPG/PNG/WEBP)
+- **Output:** Nombre científico, familia, nombres comunes, score de confianza
+- **Métrica de evaluación:** Confianza promedio del modelo sobre el dataset acumulado (visible en `pipeline.py` etapa 3 y en el tab Stats de la app)

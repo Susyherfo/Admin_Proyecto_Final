@@ -1,0 +1,9 @@
+# entorno virtual
+venv/
+
+# cache python
+__pycache__/
+*.pyc
+
+# sistema
+desktop.ini

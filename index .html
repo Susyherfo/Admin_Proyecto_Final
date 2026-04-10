@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plant Lens</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+ 
+<div class="app-wrap">
+ 
+  <!-- Header -->
+  <div class="header">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 22V12M12 12C12 8 9 4 4 3c0 5 3 9 8 9zM12 12c0-4 3-8 8-7-1 5-4 8-8 7z"/>
+      </svg>
+    </div>
+    <h1>Plant Lens</h1>
+    <p>Identify any plant from a photo</p>
+  </div>
+ 
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" id="tab-identify" onclick="switchTab('identify')">Identify</button>
+    <button class="tab-btn" id="tab-stats"    onclick="switchTab('stats')">Stats</button>
+    <button class="tab-btn" id="tab-history"  onclick="switchTab('history')">History</button>
+    <button class="tab-btn" id="tab-manual"   onclick="switchTab('manual')">My Plants</button>
+  </div>
+ 
+  <!-- ── PANEL: IDENTIFY ── -->
+  <div class="tab-panel active" id="panel-identify">
+ 
+    <!-- Upload -->
+    <div class="card upload-card">
+      <span class="upload-label">Upload image</span>
+      <div class="upload-zone" id="uploadZone">
+        <input type="file" id="imageInput" accept="image/*">
+        <img id="previewImage" src="" alt="Preview">
+        <div id="uploadPlaceholder">
+          <div class="upload-icon">
+            <svg viewBox="0 0 24 24">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+          </div>
+          <span class="upload-text">Tap to select a photo</span>
+          <span class="upload-hint">JPG, PNG or WEBP</span>
+        </div>
+      </div>
+      <button class="btn-identify" id="identifyBtn" onclick="identifyPlant()">
+        <svg viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        Identify Plant
+      </button>
+    </div>
+ 
+    <!-- Results -->
+    <div class="card results-card" id="resultsCard">
+      <div class="results-header">
+        <div class="confidence-pill">
+          <span class="confidence-dot"></span>
+          <span id="confidenceLabel">— % match</span>
+        </div>
+        <div class="plant-name" id="plantName">—</div>
+        <div class="plant-family" id="plantFamily">—</div>
+      </div>
+      <div class="results-body">
+        <div class="confidence-bar-wrap">
+          <div class="section-label">Confidence</div>
+          <div class="bar-track">
+            <div class="bar-fill" id="barFill"></div>
+          </div>
+        </div>
+        <div id="commonNamesWrap" style="display:none; margin-bottom:1.1rem;">
+          <div class="section-label">Common names</div>
+          <div class="common-names" id="commonNames"></div>
+        </div>
+        <div class="divider"></div>
+        <div class="section-label" style="margin-bottom:0.6rem;">Other matches</div>
+        <div class="alt-list" id="altList"></div>
+      </div>
+    </div>
+ 
+    <!-- Banner: planta no reconocida -->
+    <div class="card unrecognized-card" id="unrecognizedCard" style="display:none;">
+      <div class="unrec-icon">
+        <svg viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+      </div>
+      <div class="unrec-body">
+        <p class="unrec-title">Plant not recognized</p>
+        <p class="unrec-sub">Pl@ntNet couldn't identify this plant. Do you know what it is? Add it to the database so it can be found next time.</p>
+        <button class="btn-add-manual" onclick="showManualForm()">Add to database</button>
+      </div>
+    </div>
+ 
+    <!-- Formulario ingreso manual -->
+    <div class="card manual-form-card" id="manualFormCard" style="display:none;">
+      <div class="note-header">
+        <span class="upload-label" style="margin:0;">Add unknown plant</span>
+        <span class="panel-sub" style="margin-top:0.2rem;">This will be saved to your database</span>
+      </div>
+      <div class="note-body" id="manualFormBody">
+        <div class="field-group">
+          <label class="field-label">Scientific name <span class="required">*</span></label>
+          <input type="text" id="manualScientific" placeholder="e.g. Rosa canina">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Common names</label>
+          <input type="text" id="manualCommon" placeholder="e.g. Dog rose, Wild rose (comma separated)">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Family</label>
+          <input type="text" id="manualFamily" placeholder="e.g. Rosaceae">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Description</label>
+          <textarea id="manualDescription" rows="2" placeholder="Leaf shape, color, height, flowers..."></textarea>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Habitat</label>
+          <input type="text" id="manualHabitat" placeholder="e.g. Tropical forest, dry soil, riverbanks">
+        </div>
+        <div id="manualFeedback" class="manual-feedback" style="display:none;"></div>
+        <div style="display:flex; gap:0.6rem;">
+          <button class="btn-save" style="flex:1;" onclick="submitManualPlant()">Save to database</button>
+          <button class="btn-cancel" onclick="hideManualForm()">Cancel</button>
+        </div>
+      </div>
+    </div>
+ 
+    <!-- Note form (hidden until identification) -->
+    <div class="card note-card" id="noteCard" style="display:none;">
+      <div class="note-header">
+        <span class="upload-label" style="margin:0;">Save a note</span>
+      </div>
+      <div class="note-body">
+        <div class="field-group">
+          <label class="field-label">Plant name</label>
+          <input type="text" id="plantNameInput" placeholder="Scientific or common name">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Description</label>
+          <textarea id="plantDescription" rows="2" placeholder="Where did you find it? Any observations..."></textarea>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Care notes</label>
+          <textarea id="plantCare" rows="2" placeholder="Watering, sunlight, soil..."></textarea>
+        </div>
+        <button class="btn-save" onclick="savePlant()">Save to database</button>
+      </div>
+    </div>
+ 
+  </div><!-- /panel-identify -->
+ 
+  <!-- ── PANEL: STATS ── -->
+  <div class="tab-panel" id="panel-stats">
+    <div class="card">
+      <div class="panel-header">
+        <span class="upload-label" style="margin:0;">Top identified plants</span>
+        <span class="panel-sub">From curated dataset (post-ETL)</span>
+      </div>
+      <div id="statsContainer" class="list-container">
+        <p class="empty-msg">Loading...</p>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- ── PANEL: HISTORY ── -->
+  <div class="tab-panel" id="panel-history">
+    <div class="card">
+      <div class="panel-header">
+        <span class="upload-label" style="margin:0;">Recent identifications</span>
+        <span class="panel-sub">Last 20 records</span>
+      </div>
+      <div id="historyContainer" class="list-container">
+        <p class="empty-msg">Loading...</p>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- ── PANEL: MY PLANTS ── -->
+  <div class="tab-panel" id="panel-manual">
+    <div class="card">
+      <div class="panel-header">
+        <span class="upload-label" style="margin:0;">Plants added manually</span>
+        <span class="panel-sub">Contributed by you — visible in future searches</span>
+      </div>
+      <div id="manualContainer" class="list-container">
+        <p class="empty-msg">No plants added yet.</p>
+      </div>
+    </div>
+  </div>
+ 
+  <div class="footer-note">Powered by Pl@ntNet API · LEAD University</div>
+ 
+</div><!-- /app-wrap -->
+ 
+<script src="script.js"></script>
+</body>
+</html>
+ 
