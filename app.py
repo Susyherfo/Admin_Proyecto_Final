@@ -22,7 +22,7 @@ CORS(app)
 
 # ─── Conexión ─────────────────────────────────────────────────────────────────
 MONGO_URI = (
-    "mongodb+srv://elenaherfo_db_user:dhnRUXL98MGlkO8u"
+    "mongodb+srv://Usuario:Contraseña" # Reemplaza con Usuario y Contraseña reales
     "@plant-lens-app.ju0hslr.mongodb.net/?retryWrites=true&w=majority"
 )
 client     = MongoClient(MONGO_URI)
@@ -34,7 +34,7 @@ manual_col   = db["manual_plants"]            # plantas ingresadas manualmente
 
 print("[OK] Mongo Atlas conectado")
 
-API_KEY = "2b10R0dEY03ODrW4YUjHGGpyu"
+API_KEY = "Your-PlantNet-API-Key-Here"  # Reemplaza con tu clave real de Pl@ntNet
 
 
 # ══════════════════════════════════════════════════════════════════════════════

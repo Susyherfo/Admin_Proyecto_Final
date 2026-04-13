@@ -20,7 +20,7 @@ log = logging.getLogger(__name__)
 
 # ─── Conexión ─────────────────────────────────────────────────────────────────
 MONGO_URI = (
-    "mongodb+srv://elenaherfo_db_user:dhnRUXL98MGlkO8u"
+    "mongodb+srv://Usuario:Contraseña" # Reemplaza con Usuario y Contraseña reales
     "@plant-lens-app.ju0hslr.mongodb.net/?retryWrites=true&w=majority"
 )
 
